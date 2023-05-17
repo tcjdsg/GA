@@ -24,6 +24,7 @@ class Order(object):
         self.ls = 0
         self.lf = 0
         self.tf = 0
+        self.mts =0
 
         self.visited = False
         self.complete = False
@@ -67,6 +68,7 @@ class Activity(object):
         self.ls = 0
         self.lf = 0
         self.tf = 0
+        self.mts = 0#后续工序数量
 
         self.visited = False
         self.complete = False

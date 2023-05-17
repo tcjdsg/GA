@@ -94,7 +94,7 @@ class InitM(object):
         activities[0] = Order(0, 0, 0, resourceH, resourceS, resourceSpace,SUCOrder, 0)
         activities[0].predecessor = []
 
-        activities[index+1] = Order(0, 0, 0, resourceH, resourceS, resourceSpace,[], 0)
+        activities[index+1] = Order(index+1, 0, 0, resourceH, resourceS, resourceSpace,[], 0)
 
         activities[index+1].predecessor = [i*FixedMes.planeOrderNum for i in range(1, FixedMes.planeNum+1)]
 

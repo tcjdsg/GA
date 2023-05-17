@@ -3,24 +3,12 @@ from collections import defaultdict
 import scipy.stats as stats
 
 from chromosome.Chromo import Chromosome
-import numpy as np
-
-# class MyDistribution(rv_continuous):
-#     def _pdf(self, x):#概率密度分布函数
-#         return 1.0/x
-#
-# distribution = MyDistribution()
-# xlist=np.linspace(-8,8,300)
-# ylist=distribution.pdf(xlist)
-# samples=distribution.rvs(size=200)
 
 class FixedMes(object):
     """
     distance:
     orderInputMes:
-
     """
-
     distance = [[]]
 
     numJzjPos = 18
@@ -242,7 +230,7 @@ class FixedMes(object):
                  6,  # 3
                  3,  # 4
                  6,  # 5
-                5,  # 6
+                 5,  # 6
                  4,  # 7
                  5,  # 8
                  13,  # 9

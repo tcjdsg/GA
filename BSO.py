@@ -83,16 +83,16 @@ class bso(object):
                 centerIndex = np.random.randint(0,self.number_of_individuals)
                 if centerIndex in self.clusterCenterIndex:
                     continue
-                #确保随机挑选的类中心之间相距不会太近
+                # #确保随机挑选的类中心之间相距不会太近
                 if i!=0:
                     for j in range(0,i):
                         m = i-1-j
-                        if self.getdistance(self.Pop[centerIndex],self.Pop[self.clusterCenterIndex[m]])<0:
+                        if self.getdistance(self.Pop[centerIndex],self.Pop[self.clusterCenterIndex[m]])<0.0001:
                             flag=True
                             break
                 if flag==True:
                     continue
-                #如果类中心既未重复也未距离其他类中心太近，跳出循环
+                # 如果类中心既未重复也未距离其他类中心太近，跳出循环
                 break
             self.clusterCenterIndex[i] = centerIndex
 
@@ -173,7 +173,6 @@ class bso(object):
             self.clusterCenterIndex[i] = centerIndex
     def newIndividualGenerate1(self):
         self.nSolutions = []
-
         #    判断是否需要随机挑选出来一个类中心去替换掉
         #    这是一种发散操作
         self.r_clustering = random.random()
@@ -198,7 +197,6 @@ class bso(object):
 
         for i in range(self.number_of_individuals):
             newObject = Chromosome()
-
             if i < Ntex:
                 self.r_twoCluster = random.random()
                 # 随机选取两个类
@@ -228,9 +226,13 @@ class bso(object):
                 else:
                     clusterSize1 = len(self.cluster[clusterIndex1])
                     clusterSize2 = len(self.cluster[clusterIndex2])
+                    try:
 
-                    individualIndex1 = self.cluster[clusterIndex1][np.random.randint(0, clusterSize1)]
-                    individualIndex2 = self.cluster[clusterIndex2][np.random.randint(0, clusterSize2)]
+                        individualIndex1 = self.cluster[clusterIndex1][np.random.randint(0, clusterSize1)]
+                        individualIndex2 = self.cluster[clusterIndex2][np.random.randint(0, clusterSize2)]
+
+                    except:
+                        print(clusterSize1,clusterSize2)
 
                     while len(self.cluster[clusterIndex1]) != 1 and individualIndex1 == self.clusterCenterIndex[
                         clusterIndex1]:
