@@ -38,7 +38,6 @@ class Ga(object):
         fitness = []
         for p in self.Pop:
             fitness.append(p.WorkTime)
-
         fitness = np.array(fitness)
         p = []
         secret_p = 1.5  # 选择压力

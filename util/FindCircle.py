@@ -32,6 +32,73 @@ class Graph():
         return False #如果分别以每个节点作为起点的深度遍历都没有发现环，那肯定是整个图没有环
 
 
+# class Solution {
+#     boolean[] visited;  // 记录遍历过的节点，防止走回头路
+#     boolean[] onPath;  // 记录一次递归堆栈中的节点
+#     boolean hasCycle;
+#     public boolean canFinish(int numCourses, int[][] prerequisites) {
+#         // 建立有向图，判断有向图中是否存在环
+#         List<Integer>[] graph = new LinkedList[numCourses];  // 数组链表，数组中每个元素都是一个链表
+#         visited = new boolean[numCourses];
+#         onPath = new boolean[numCourses];
+#         hasCycle = false;
+#         for (int i = 0; i < numCourses; i++) {
+#             graph[i] = new LinkedList<>();  // 每一个元素都要初始化，因为成员变量没有默认值
+#         }
+#         for (int[] edges: prerequisites) {
+#             int from = edges[1], to = edges[0];  // 要想修课程edges[0], 必须先修课程edges[1]
+#             graph[from].add(to);  // 建立每个元素的链表
+#         }
+#
+#         // 遍历图，判断是否有环——DFS
+#         for (int i = 0; i < numCourses; i++) {
+#             dfs(graph, i);
+#         }
+#         return !hasCycle;
+#     }
+#     public void dfs(List<Integer>[] graph, int s){
+#         // visited记录访问过的节点，onPath记录正在访问的路径（用于判断环）
+#         if(onPath[s]){
+#             hasCycle = true;
+#         }
+#         if(visited[s] || hasCycle){
+#             return;
+#         }
+#
+#         onPath[s] = true;
+#         visited[s] = true;
+#         for (int t: graph[s]) {
+#             dfs(graph, t);
+#         }
+#         onPath[s] = false;
+#     }
+# }
+# class Solution {
+#     public boolean canFinish(int numCourses, int[][] prerequisites) {
+#         int[] indegrees = new int[numCourses];
+#         List<List<Integer>> adjacency = new ArrayList<>();
+#         Queue<Integer> queue = new LinkedList<>();
+#         for(int i = 0; i < numCourses; i++)
+#             adjacency.add(new ArrayList<>());
+#         // Get the indegree and adjacency of every course.
+#         for(int[] cp : prerequisites) {
+#             indegrees[cp[0]]++;
+#             adjacency.get(cp[1]).add(cp[0]);
+#         }
+#         // Get all the courses with the indegree of 0.
+#         for(int i = 0; i < numCourses; i++)
+#             if(indegrees[i] == 0) queue.add(i);
+#         // BFS TopSort.
+#         while(!queue.isEmpty()) {
+#             int pre = queue.poll();
+#             numCourses--;
+#             for(int cur : adjacency.get(pre))
+#                 if(--indegrees[cur] == 0) queue.add(cur);
+#         }
+#         return numCourses == 0;
+#     }
+# }
+
 
 
 if __name__ == '__main__':
