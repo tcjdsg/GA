@@ -2,7 +2,6 @@ import copy
 import functools
 import math
 
-from schedulePolicy.CreatCpc import newAON
 from Mythread.myInit import MyInit
 from conM.FixedMess import *
 from util import utils

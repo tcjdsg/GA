@@ -42,8 +42,8 @@ class FixedMes(object):
     total_station_resource = [6,9,6,5,6]
 
     #飞机数量比较少的时候，这些燃料资源的限制约束不起作用。
-    # total_renew_resource = [5,5,2,4,2]
-    total_renew_resource = [99,99,99,99,99]
+    total_renew_resource = [5,5,2,4,2]
+    # total_renew_resource = [99,99,99,99,99]
 
     constraintS_Order = defaultdict(lambda: [])  # 记录每类设备的可作用工序，和可作用舰载机范围
 
@@ -92,7 +92,6 @@ class FixedMes(object):
                           ]
 
     Activity_num  = (planeOrderNum)*planeNum+2 #活动数量
-
     #工序顺序
     SUCOrder = defaultdict(lambda: [])
     SUCOrder[1] = [2,4,6,9,10,11,12,13,14]
@@ -183,6 +182,15 @@ class FixedMes(object):
     populationnumber = 50
     ge = 100
 
+    # 记录每一代的最优染色体
+    recordBest = [Chromosome() for _ in range(ge+1)]
+    # 记录每一代的最坏染色体
+    recordBad = [Chromosome() for _ in range(ge + 1)]
+
+    recordBestD = [Chromosome() for _ in range(ge+1)]
+    # 记录每一代的最坏染色体
+    recordBadD = [Chromosome() for _ in range(ge + 1)]
+
     threadNum = 1
     populationnumberson = populationnumber
 
@@ -204,6 +212,7 @@ class FixedMes(object):
     Paternal = [[0,0] for _ in range(int(populationnumber/2))]
     #每一代的平均值
     Avufit = {}
+    Bestfit={}
     AverPopmove = 0
     AverPopTime = 0
     AverPopVar = 0

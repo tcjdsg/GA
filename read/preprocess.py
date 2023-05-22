@@ -10,17 +10,16 @@ from activity.Activitity import Order
 
 
 class InitM(object):
-    def __init__(self, filenameDis, filenameJob):
+    def __init__(self, filenameDis):
 
         self.filename1 = filenameDis
-        self.filename2 = filenameJob
+
 
         self.humanMoveTime = []
         self.num_activities = 0
         self.num_resource_type = 0
         self.total_resource = []
         self.activities = { }
-
     def readDis(self):
 
         dis = pd.read_csv(self.filename1, header=None,encoding="utf-8").values

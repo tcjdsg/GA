@@ -4,13 +4,13 @@ import math
 import numpy as np
 import torch
 
+from Mythread.myInit import MyInit
 from util import utils
-from Mythread import myRun,myInit
+
 from chromosome.Chromo import Chromosome
-from conM import FixedMess
-from conM.FixedMess import FixedMes
+
 from  collections import defaultdict
-from edges.Edge import Edge
+
 from util.utils import *
 import random
 
@@ -30,8 +30,7 @@ class Ga(object):
         self.select()
         self.Crossover()
         self.Variation()
-
-
+        self.updata()
 
     def select(self):
 
@@ -68,6 +67,8 @@ class Ga(object):
         for i in range(len(FixedMes.Paternal)):
             two = np.random.choice(index, 2, False)
             FixedMes.Paternal[i] = two
+
+
     def Crossover(self):
 
         num_sonfit = 0
@@ -100,31 +101,11 @@ class Ga(object):
             num_sonfit += 1
             FixedMes.AllFitSon[num_sonfit] = temp2
             num_sonfit += 1
-    def cr1(self, pop1, pop2):
-        a = copy.deepcopy(pop1)
-        b = copy.deepcopy(pop2)
 
-        pos1 = random.randint(1, self.acts - 1)
-
-        pos2 = gen_randint(1, self.acts - 1, pos1)
-
-        tempb1 = copy.deepcopy(b.codes[:pos1])
-        tempb2 = copy.deepcopy(b.codes[pos2:])
-        tempa1 = copy.deepcopy(a.codes[:pos1])
-        tempa2 = copy.deepcopy(a.codes[pos2:])
-        b.codes[:pos1] = tempa1
-        b.codes[pos2:] = tempa2
-
-        a.codes[:pos1] = tempb1
-        a.codes[pos2:] = tempb2
-        #
-        # MyInit.fitness(a, [],[],[])
-        # MyInit.fitness(b, [], [],[])
-
-        return a, b
     def cr2(self, pop1, pop2):
-        a = pop1.codes
-        b = pop2.codes
+
+        a = copy.deepcopy(pop1.codes)
+        b = copy.deepcopy(pop2.codes)
 
         pos = random.randint(1, self.acts - 1)
 
@@ -146,9 +127,12 @@ class Ga(object):
                     break
         # print(i,i+1,len(temp2))
         pop11 = Chromosome()
-        pop11.codes = temp1.tolist()
+        pop11.setcodes(temp1.tolist())
+
         pop22 = Chromosome()
-        pop22.codes = temp2.tolist()
+        pop22.setcodes(temp2.tolist())
+        MyInit.fitness(pop11)
+        MyInit.fitness(pop22)
 
         return pop11, pop22
     def Variation(self):
@@ -354,8 +338,7 @@ class Ga(object):
             print(TI)
             print(Td)
 
-
-        # MyInit.fitness(newpop,[],[],[])
+        MyInit.fitness(newpop)
         return newpop
 
     # def var2(self,pop):

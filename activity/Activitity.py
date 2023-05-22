@@ -14,9 +14,9 @@ class Order(object):
         self.belong_plane_id = jzjId
 
         self.duration = duration
-        self.resourceRequestH = np.array(resourceRequestH)
-        self.resourceRequestS = np.array(resourceRequestS)
-        self.resourceRequestSpace = np.array(resourceRequestSpace)
+        self.resourceRequestH = resourceRequestH
+        self.resourceRequestS = resourceRequestS
+        self.resourceRequestSpace = resourceRequestSpace
         self.predecessor = None
         self.successor = successor
         self.es = 0
@@ -39,8 +39,8 @@ class Order(object):
         self.SNums = [] #执行任务编号
     def __lt__(self, other):
         return self.es < other.es
-    def __eq__(self, other):
-        return self.es == other.es
+    # def __eq__(self, other):
+    #     return self.es == other.es
     def __gt__(self, other):
         return self.es > other.es
 
