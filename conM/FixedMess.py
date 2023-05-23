@@ -23,7 +23,7 @@ class FixedMes(object):
     total_space_resource = [1 for i in range(planeNum)]
 
     Human_resource_type = 4 #先考虑只有一类人
-    total_Huamn_resource = [4,5,8,10]  # 每种人员数量
+    total_Huamn_resource = [4,5,8,8]  # 每种人员数量
 
     # total_Huamn_resource = [30]
     constraintOrder = defaultdict(lambda: []) #记录每类人的可作用工序，和可作用舰载机范围
@@ -260,52 +260,6 @@ class FixedMes(object):
                  ]
     AON=[]
 
-    @classmethod
-    def getTime(cls,i):
-        # 定义每种任务的时间分布
-        sigma = 0.3
-        if i == 0:
-            return 0
-        elif i == 1:
-            return 0
-        elif i == 2:
-            return stats.truncnorm((-0.5) / sigma, 0.5 / sigma, loc = cls.OrderTime[2], scale=sigma).rvs()
-        elif i == 3:
-            return stats.truncnorm((-0.8) / sigma, 0.8 / sigma, loc=cls.OrderTime[3], scale=sigma).rvs()
-        elif i == 4:
-            return stats.truncnorm((-0.5) / sigma, 0.5 / sigma, loc=cls.OrderTime[4], scale=sigma).rvs()
-        elif i == 5:
-            return stats.truncnorm((-0.5) / sigma, 0.5 / sigma, loc=cls.OrderTime[5], scale=sigma).rvs()
-        elif i == 5:
-            return stats.truncnorm((-0.5) / sigma, 0.5 / sigma, loc=cls.OrderTime[5], scale=sigma).rvs()
-        elif i == 6:
-            return stats.truncnorm((-0.5) / sigma, 0.5 / sigma, loc=cls.OrderTime[6], scale=sigma).rvs()
-        elif i == 7:
-            return stats.truncnorm((-0.5) / sigma, 0.5 / sigma, loc=cls.OrderTime[7], scale=sigma).rvs()
-
-        elif i == 8:
-            return stats.truncnorm((-0.5) / sigma, 0.5 / sigma, loc=cls.OrderTime[8], scale=sigma).rvs()
-        elif i == 9:
-            return stats.truncnorm((-0.5) / sigma, 0.5 / sigma, loc=cls.OrderTime[9], scale=sigma).rvs()
-
-        elif i == 10:
-            return stats.truncnorm((-0.5) / sigma, 0.5 / sigma, loc=cls.OrderTime[10], scale=sigma).rvs()
-        elif i == 11:
-            return stats.truncnorm((-0.5) / sigma, 0.5 / sigma, loc=cls.OrderTime[11], scale=sigma).rvs()
-
-        elif i == 12:
-            return stats.truncnorm((-0.5) / sigma, 0.5 / sigma, loc=cls.OrderTime[12], scale=sigma).rvs()
-        elif i == 13:
-            return stats.truncnorm((-0.5) / sigma, 0.5 / sigma, loc=cls.OrderTime[13], scale=sigma).rvs()
-        elif i == 14:
-            return stats.truncnorm((-0.5) / sigma, 0.5 / sigma, loc=cls.OrderTime[14], scale=sigma).rvs()
-
-        elif i == 15:
-            return stats.truncnorm((-0.5) / sigma, 0.5 / sigma, loc=cls.OrderTime[15], scale=sigma).rvs()
-        elif i == 16:
-            return stats.truncnorm((-0.5) / sigma, 0.5 / sigma, loc=cls.OrderTime[16], scale=sigma).rvs()
-        elif i == 17:
-            return 0
     @classmethod
     def my(cls):
 
