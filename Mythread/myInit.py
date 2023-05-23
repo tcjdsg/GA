@@ -34,13 +34,12 @@ class MyInit(object):
         self.geneN = 0
         self.activities = {}
         self.Init = InitM(filenameDis)
-
-    def InitPopulation(self):
-
         FixedMes.distance = self.Init.readDis()
         self.activities = self.Init.readData()
         self.geneN = FixedMes.Activity_num
         FixedMes.act_info = self.activities
+
+    def InitPopulation(self):
         num = 0
         print("正在生成种群。。。。")
         while num < FixedMes.populationnumber:
@@ -102,6 +101,7 @@ class MyInit(object):
         for key,acti in newAct.items():
             iter.activityES[key] = acti.es
             iter.activityEF[key] = acti.ef
+
 
         iter.setf()
         return Humans,Stations,Spaces ,iter.WorkTime,newAct

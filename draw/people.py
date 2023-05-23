@@ -18,7 +18,7 @@ def Draw1(all_people):
                 time1= order.es
                 time2= order.ef
                 if (time2 - time1) != 0:
-                   plt.barh(number, time2 - time1-0.1,
+                   plt.barh(number, time2 - time1-0.001,
                      left=time1, color=colors[job])
                 news = str(gongxu)
                 infmt = '(' + str(job ) + ',' + news +')'
@@ -85,3 +85,5 @@ def Draw(all_people,sebei):
     ax2.legend(handles=patches, loc=4)
 
     plt.show()
+
+

@@ -94,8 +94,9 @@ def judgeRenew(allTasks, stations, resourceSumNew, selectTaskID,  t, dur):
                             resourceSumNew[type] += 1
             #可用资源有多少：
             remian = max(FixedMes.total_renew_resource[type]-FixedMes.total_station_resource[type], 0)
-
-            if remian + resourceSumNew[type] < allTasks[selectTaskID].resourceRequestS[type]:
+            used  = max(FixedMes.total_station_resource[type]-resourceSumNew[type], 0)
+            if (remian + resourceSumNew[type] < allTasks[selectTaskID].resourceRequestS[type]) or \
+                    (used + allTasks[selectTaskID].resourceRequestS[type]) > FixedMes.total_renew_resource[type]:
                 return False
 
     return True

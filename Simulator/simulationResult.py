@@ -17,6 +17,7 @@ class SimulationResult(object):
             self.jobs[job.id] = job
             job.scheduler = None
 
+
 def save_simulation_result(result, output_file):
     Logger.info("writing simulation result to file: %s" % output_file)
     cPickle.dump(result, open(output_file, "wb"))

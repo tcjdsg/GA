@@ -4,6 +4,7 @@ import math
 import numpy as np
 import torch
 
+from JudgeResource.fitness import fitness
 from Mythread.myInit import MyInit
 from util import utils
 
@@ -23,14 +24,18 @@ class Ga(object):
         self.DCmin=10
         self.humanNum = self.pa.humanNum
 
-    def RUN(self,i,pop):
+    def RUN(self,i,pop,cmax,ns):
+        self.Cmax= cmax
+        self.ns = ns
         self.Pop = pop
         self.cur=i
+        self.count = 0
         # print("----------- ----",i,"--------------")
         self.select()
         self.Crossover()
         self.Variation()
         self.updata()
+        return self.count
 
     def select(self):
 
@@ -67,8 +72,6 @@ class Ga(object):
         for i in range(len(FixedMes.Paternal)):
             two = np.random.choice(index, 2, False)
             FixedMes.Paternal[i] = two
-
-
     def Crossover(self):
 
         num_sonfit = 0
@@ -131,8 +134,10 @@ class Ga(object):
 
         pop22 = Chromosome()
         pop22.setcodes(temp2.tolist())
-        MyInit.fitness(pop11)
-        MyInit.fitness(pop22)
+
+        fitness(pop11, self.Cmax, self.ns)
+        fitness(pop22, self.Cmax, self.ns)
+        self.count += 2
 
         return pop11, pop22
     def Variation(self):
@@ -337,8 +342,9 @@ class Ga(object):
             print(dr)
             print(TI)
             print(Td)
+        self.count += 1
 
-        MyInit.fitness(newpop)
+        fitness(newpop, self.Cmax, self.ns)
         return newpop
 
     # def var2(self,pop):
@@ -402,14 +408,11 @@ class Ga(object):
     #             reres[1] = arrSlect[i]
     #     return reres
     #
-
-
-
     def updata(self):
 
-        FixedMes.AllFit=sorted(FixedMes.AllFit,key=lambda x:x.WorkTime)
+        FixedMes.AllFit=sorted(FixedMes.AllFit,key=lambda x:x.zonghe)
         best = copy.deepcopy(FixedMes.AllFit[0])
-        FixedMes.AllFitSon=sorted(FixedMes.AllFitSon, key=lambda x: -x.WorkTime)
+        FixedMes.AllFitSon=sorted(FixedMes.AllFitSon, key=lambda x: -x.zonghe)
 
         bad = copy.deepcopy(FixedMes.AllFitSon[0])
         FixedMes.AllFit = copy.deepcopy(FixedMes.AllFitSon)

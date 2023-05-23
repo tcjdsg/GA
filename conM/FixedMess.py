@@ -22,7 +22,6 @@ class FixedMes(object):
     space_resource_type = planeNum
     total_space_resource = [1 for i in range(planeNum)]
 
-
     Human_resource_type = 4 #先考虑只有一类人
     total_Huamn_resource = [4,5,8,10]  # 每种人员数量
 
@@ -43,6 +42,7 @@ class FixedMes(object):
 
     #飞机数量比较少的时候，这些燃料资源的限制约束不起作用。
     total_renew_resource = [5,5,2,4,2]
+    # total_renew_resource = [1,1,1,1,1]
     # total_renew_resource = [99,99,99,99,99]
 
     constraintS_Order = defaultdict(lambda: [])  # 记录每类设备的可作用工序，和可作用舰载机范围
@@ -212,7 +212,11 @@ class FixedMes(object):
     Paternal = [[0,0] for _ in range(int(populationnumber/2))]
     #每一代的平均值
     Avufit = {}
-    Bestfit={}
+    BestCmax = {}
+    BestPr = {}
+    BestEcmax = {}
+    Bestzonghe = {}
+
     AverPopmove = 0
     AverPopTime = 0
     AverPopVar = 0

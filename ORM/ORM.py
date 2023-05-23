@@ -10,20 +10,16 @@ class DistributionType(Enum):
     FITTED = 2
     PHASE = 3
     PRECOMPUTED = 4
-
-
-
 class Job(object):
     def __init__(self):
         # 读取所有任务数据
-        self.tasks = data.readData()
+        self.tasks = {}
         # 只考虑供给型资源
         self.resources = FixedMes.total_renew_resource
         # 这个是能力匹配的，之后可以考虑？
         self.capabilities = {}
 
         self.already_initialized = False
-
 class Task:
     """
     representation of a task. For details see ER diagram
