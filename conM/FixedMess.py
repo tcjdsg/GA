@@ -9,8 +9,6 @@ class FixedMes(object):
     distance:
     orderInputMes:
     """
-
-
     distance = [[]]
 
     numJzjPos = 18
@@ -25,8 +23,7 @@ class FixedMes(object):
     total_space_resource = [1 for i in range(planeNum)]
 
     Human_resource_type = 4 #先考虑只有一类人
-    # 特设、航电、军械、机械
-    total_Huamn_resource = [5,7,10,12]  # 每种人员数量
+    total_Huamn_resource = [4,5,8,10]  # 每种人员数量
 
     # total_Huamn_resource = [30]
     constraintOrder = defaultdict(lambda: []) #记录每类人的可作用工序，和可作用舰载机范围
@@ -41,12 +38,12 @@ class FixedMes(object):
     # constraintJZJ = defaultdict(lambda: []) #保障人员可作用舰载机范围,两种模式，单机或者全甲板
 
     station_resource_type = 5
-    total_station_resource = [6,12,5,5,6]
+    total_station_resource = [6,9,6,5,6]
 
     #飞机数量比较少的时候，这些燃料资源的限制约束不起作用。
-    # total_renew_resource = [5,5,2,4,2]
-    # # total_renew_resource = [1,1,1,1,1]
-    total_renew_resource = [99,99,99,99,99]
+    total_renew_resource = [5,5,2,4,2]
+    # total_renew_resource = [1,1,1,1,1]
+    # total_renew_resource = [99,99,99,99,99]
 
     constraintS_Order = defaultdict(lambda: [])  # 记录每类设备的可作用工序，和可作用舰载机范围
 
@@ -56,202 +53,90 @@ class FixedMes(object):
     constraintS_JZJ[0] = [[1, 2, 3],
                           [3, 4, 5],
                           [6, 7],
-                          [7,8,9],
-                          [9,10,11],
-                          [12]]
+                          [7, 8,9],
+                          [8,9,10],
+                          [11,12]]
 
-    constraintS_JZJ[1] = [[1],
-                          [2],
-                          [3],
-                          [4],
-                          [5],
-                          [6],
-                          [7],
-                          [8],
-                          [9],
-                          [10],
-                          [11],
-                          [12]
+    constraintS_JZJ[1] = [[1,2,3],
+                          [2,3,4],
+                          [4,5,6],
+                          [5,6],
+                          [7,8],
+                          [8,9,10],
+                          [9,10],
+                          [11,12],
+                          [11,12]
                           ]
     constraintS_JZJ[2] = [[1,2,3,4],
-                          [4,5,6,7],
-                          [7,8,9],
-                          [9,10,11],
-                          [12]
+                          [4,5,6],
+                          [7],
+                          [5,6],
+                          [8,9],
+                          [8,9,10],
+                          [11,12]
                           ]
 
     constraintS_JZJ[3] = [[1,2,3,4],
-                          [4,5,6,7],
+                          [4,5,6],
                           [7,8,9],
-                          [9,10,11],
-                          [12]
+                          [8,9,10],
+                          [11,12]
                           ]
 
     constraintS_JZJ[4] = [[1,2,3],
                           [2,3,4],
                           [4,5,6],
                           [7,8,9],
-                          [9,10,11],
-                          [12]
+                          [9,10],
+                          [11,12]
                           ]
 
     Activity_num  = (planeOrderNum)*planeNum+2 #活动数量
     #工序顺序
     SUCOrder = defaultdict(lambda: [])
-    SUCOrder[1] = [2,4,6,11,12,13]
+    SUCOrder[1] = [2,4,6,9,10,11,12,13,14]
     SUCOrder[2] = [3]
-    SUCOrder[3] = [10]
+    SUCOrder[3] = [15]
     SUCOrder[4] = [5]
-    SUCOrder[5] = [10]
-    SUCOrder[6] = [3,5,7,9]
-    SUCOrder[7] = [14]
-    SUCOrder[8] = [9]
-    SUCOrder[9] = [10]
-    SUCOrder[10] = [14]
+    SUCOrder[5] = [15]
+    SUCOrder[6] = [7]
+    SUCOrder[7] = [8]
+    SUCOrder[8] = [15]
+    SUCOrder[9] = [15]
+    SUCOrder[10] = [15]
     SUCOrder[11] = [18]
-    SUCOrder[12] = [18]
+    SUCOrder[12] = [15]
     SUCOrder[13] = [18]
-    SUCOrder[14] = [15,16]
-    SUCOrder[15] = [17]
-    SUCOrder[16] = [17]
+    SUCOrder[14] = [18]
+    SUCOrder[15] = [16,17]
+    SUCOrder[16] = [18]
     SUCOrder[17] = [18]
     SUCOrder[18] = [19]
     SUCOrder[19] = []
-    # SUCOrder[1] = [2,4,6,9,10,11,12,13,14]
-    # SUCOrder[2] = [3]
-    # SUCOrder[3] = [15]
-    # SUCOrder[4] = [5]
-    # SUCOrder[5] = [15]
-    # SUCOrder[6] = [7]
-    # SUCOrder[7] = [8]
-    # SUCOrder[8] = [15]
-    # SUCOrder[9] = [15]
-    # SUCOrder[10] = [15]
-    # SUCOrder[11] = [18]
-    # SUCOrder[12] = [15]
-    # SUCOrder[13] = [18]
-    # SUCOrder[14] = [18]
-    # SUCOrder[15] = [16,17]
-    # SUCOrder[16] = [18]
-    # SUCOrder[17] = [18]
-    # SUCOrder[18] = [19]
-    # SUCOrder[19] = []
 
-    # SUCOrder[1] = [2, 3]
-    # SUCOrder[2] = [4]
-    # SUCOrder[3] = [4]
-    # SUCOrder[4] = [5, 6, 7]
-    # SUCOrder[5] = [12]
-    # SUCOrder[6] = [8, 9]
-    # SUCOrder[7] = [10]
-    # SUCOrder[8] = [11]
-    # SUCOrder[9] = [12]
-    # SUCOrder[10] = [12]
-    # SUCOrder[11] = [12]
-    # SUCOrder[12] = [13]
-    # SUCOrder[13] = []
-    #
-    # OrderInputMes = [[],
-    #                  [(0, 0), (0, 0), (0, 0)],  # 虚拟1
-    #                  [(0, 1), (0, 0), (0, 0)],  # 2通风
-    #                  [(0, 1), (1, 1), (0, 1)],  # 3电源
-    #                  [(1, 1), (0, 0), (0, 0)],  # 4机翼展开
-    #                  [(1, 1), (1, 1), (0, 0)],  # 5充氧
-    #                  [(2, 1), (0, 0), (0, 0)],  # 6充氮
-    #                  [(2, 2), (1, 1), (0, 1)],  # 7通电
-    #                  [(2, 2), (0, 0), (0, 0)],  # 8,挂弹
-    #                  [(3, 1), (0, 1), (0, 1)],  # 9加油
-    #                  [(3, 1), (4, 1), (0, 0)],  # 10飞参
-    #                  [(3, 1), (3, 1), (0, 0)],  # 11弹药加载
-    #                  [(3, 2), (1, 1), (0, 1)],  # 12机翼展开
-    #                  [(3, 1), (0, 0), (0, 0)],  # 13
-    #                  [(3, 1), (0, 0), (0, 1)],  # 14
-    #                  [(0, 1), (2, 1), (0, 0)],  # 15
-    #                  [(2, 1), (0, 0), (0, 0)],  # 16
-    #                  [(2, 1), (0, 0), (0, 0)],  # 17
-    #                  [(1, 2), (0, 0), (0, 0)],  # 18
-    #                  [(0, 0), (0, 0), (0, 0)]  # 19
-    #                  ]
-    #
 
+    #
     OrderInputMes = [[],
                      [(0, 0), (0, 0), (0, 0)],  # 虚拟1
                      [(0, 1), (0, 0), (0, 0)],  # 2
                      [(0, 1), (1, 1), (0, 1)],  # 3
                      [(1, 1), (0, 0), (0, 0)],  # 4
-                     [(1, 1), (1, 1), (0, 1)],  # 5
-                     [(0, 1), (2, 1), (0, 0)],  # 6
-                     [(3, 2), (0, 1), (0, 0)],  # 7
+                     [(1, 1), (1, 1), (0, 0)],  # 5
+                     [(2, 1), (0, 0), (0, 0)],  # 6
+                     [(2, 2), (1, 1), (0, 1)],  # 7
                      [(2, 2), (0, 0), (0, 0)],  # 8,
-                     [(2, 1), (1, 1), (0, 1)],  # 9
-                     [(3, 1), (0, 0), (0, 1)],  # 10
+                     [(3, 1), (0, 1), (0, 1)],  # 9
+                     [(3, 1), (4, 1), (0, 0)],  # 10
                      [(3, 1), (3, 1), (0, 0)],  # 11
-                     [(3, 2), (0, 0), (0, 0)],  # 12
+                     [(3, 2), (1, 1), (0, 1)],  # 12
                      [(3, 1), (0, 0), (0, 0)],  # 13
-                     [(3, 1), (4, 1), (0, 0)],  # 14
-                     [(2, 1), (0, 0), (0, 0)],  # 15
+                     [(3, 1), (0, 0), (0, 1)],  # 14
+                     [(0, 1), (2, 1), (0, 0)],  # 15
                      [(2, 1), (0, 0), (0, 0)],  # 16
-                     [(3, 1), (4, 1), (0, 0)],  # 17
+                     [(2, 1), (0, 0), (0, 0)],  # 17
                      [(1, 2), (0, 0), (0, 0)],  # 18
                      [(0, 0), (0, 0), (0, 0)]  # 19
                      ]
-
-    VACP =[0,
-                 0,  # 虚拟1
-                 1.8,  # 2 特设外观检查 #供电
-                 1,  # 3 特设座舱检查
-                 1,  # 4 航电外观检查
-                 1,  # 5 航电座舱检查
-                 1.5,  # 6 充氧
-                 2,  # 7 加油
-                 1,  # 8 军械外观检查
-                 1,  # 9 军械座舱检查
-                 1,  # 10 机械座舱检查
-                 1.5,  # 11 充氮
-                 1, # 12 机械外观检查
-                 1, # 13 发动机检查
-                 1.2, # 14 机翼展开
-                 2, # 15 挂弹
-                 2, # 16 挂弹
-                 1.2, # 17 收机翼
-                 1.2, # 18 惯导
-                 0 # 19
-            ]
-
-
-    OrderTime = [0,
-                 0,  # 虚拟1
-                 3,  # 2 特设外观检查
-                 6,  # 3 特设座舱检查
-                 3,  # 4 航电外观检查
-                 6,  # 5 航电座舱检查
-                 5,  # 6 充氧
-                 4,  # 7 加油
-                 5,  # 8 军械外观检查
-                 13,  # 9 军械座舱检查
-                 4,  # 10 机械座舱检查
-                 4,  # 11 充氮
-                 3,  # 12 机械外观检查
-                 12,  # 13 发动机检查
-                 8,  # 14 机翼展开
-                 3,  # 15 挂弹
-                 8,  # 16 挂弹
-                 10,  # 17 收机翼
-                 7, # 18 惯导
-                 0 # 19
-                 ]
-    lowTime = 90  # 不能超过90 min
-    HS = 3
-    Lpk = [0 for _ in range(Human_resource_type)]
-    for p in range(planeNum):
-        for i in range(1,planeOrderNum+1):
-            needRtype = OrderInputMes[i][0][0]
-            needNums = OrderInputMes[i][0][1]
-            dur = OrderTime[i]
-            Lpk[needRtype] += HS*needNums*dur/lowTime
-
-    Lpk = [int(i) for i in Lpk]
-    total_Huamn_resource = Lpk
 
     # OrderInputMes = [[],
     #                  [(0, 0), (0, 0), (0, 0)],  # 虚拟1
@@ -277,10 +162,13 @@ class FixedMes(object):
 
 
     #17位 为了让虚拟从1开始
+
     sigma = 0.3
     shedule_num=0
+
     act_info={}
 
+    lowTime = 90 #不能超过90 min
 
     cross = 0.5
     cross1 = 2.5
@@ -291,8 +179,8 @@ class FixedMes(object):
     transfer_iter = 50
     human_walk_speed = 800000000 #人员行走速度8 m/(in)
 
-    populationnumber = 40
-    ge = 15
+    populationnumber = 50
+    ge = 100
 
     # 记录每一代的最优染色体
     recordBest = [Chromosome() for _ in range(ge+1)]
@@ -328,10 +216,6 @@ class FixedMes(object):
     BestPr = {}
     BestEcmax = {}
     Bestzonghe = {}
-    var ={}
-    f = {}
-    d = {}
-    m = {}
 
     AverPopmove = 0
     AverPopTime = 0
@@ -353,10 +237,27 @@ class FixedMes(object):
     boundUpper =[0,0]
     boundLowwer=[]
 
-
-
-
-
+    OrderTime = [0,
+                 0,  # 虚拟1
+                 3,  # 2
+                 6,  # 3
+                 3,  # 4
+                 6,  # 5
+                 5,  # 6
+                 4,  # 7
+                 5,  # 8
+                 13,  # 9
+                 6,  # 10
+                 4,  # 11
+                 3, # 12
+                 12, # 13
+                 8, # 14
+                 3, # 15
+                 8, # 16
+                 10, # 17
+                 7, # 18
+                 0 # 19
+                 ]
     AON=[]
 
     @classmethod
