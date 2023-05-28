@@ -1,10 +1,46 @@
 import bisect
 import random
+from collections import defaultdict
+
 import matplotlib.pyplot  as plt
+import pandas as pd
+
 from conM import FixedMess
 from conM.FixedMess import FixedMes
 import scipy.stats as stats
+def judgeS1S2(s1,s2):
+    for i in range(len(s1)):
+        if s1[i] < s2[i]:
+            return False
+    return True
 
+def recordTime(allTasks):
+    jzj = defaultdict(lambda: [])
+
+    for id, value in allTasks.items():
+        planeid = value.belong_plane_id
+        if planeid == 0:
+            continue
+        taskid = value.taskid
+        if taskid == 1:
+            continue
+        if taskid == FixedMes.planeOrderNum:
+            continue
+        es = value.es
+        ef = value.ef
+        jzj[planeid].append((es, ef))
+def build_Pc_q_table(n_states, actions):
+    return pd.DataFrame(
+        np.zeros((n_states, len(actions))),
+        columns=actions
+    )
+
+
+def build_Pm_q_table(n_states, actions):
+    return pd.DataFrame(
+        np.zeros((n_states, len(actions))),
+        columns=actions
+    )
 def get_next_execution_time(i):
     sigma = 0.3
     if i == 0:
@@ -120,7 +156,6 @@ def choice(population, weights):
     idx = bisect.bisect(cdf_vals, x)
     return population[idx]
 
-
 def findW(D, total_resource, P):
     W = []
     useNowResource = [0 for i in range(len(total_resource))]
@@ -163,6 +198,7 @@ def conditionCheck(allltasks, AON, code, s):
         if flag == True:
             D.append(allltasks[i - 1])
     return D
+
 def randomint_plus(low, high=None, cutoff=None, size=None):
     """用来生成不包含一些中间数值的随机整数或序列
 
@@ -213,7 +249,6 @@ def randomint_plus(low, high=None, cutoff=None, size=None):
 
 def randint_digit(low, high, cutoff):
     """用来生成一个在区间[low, high)排除cutoff后的随机整数
-
     Parameters
     ----------
     low: int
@@ -240,7 +275,6 @@ def gen_randint(low, high, discard):
     result_list = list(range(low, high))
     result_list.remove(discard)
     np.random.shuffle(result_list)
-
     return result_list.pop()
 
 def Dominate(Pop1, Pop2):
@@ -379,8 +413,6 @@ def cpm(Activities):
         for toid in activity.successor:
             edge.append((id,toid,activity.duration))
 
-
-
     DG = nx.DiGraph()  # 创建：空的 有向图
     DG.add_nodes_from(range(0, len(Activities)), VE=0, VL=0)
     DG.add_weighted_edges_from(edge)
@@ -450,13 +482,5 @@ def judgeFitness(pop1, pop2):
                 return -1
             if pop1.WorkTime < pop2.WorkTime:
                 return 0
-
-
-
-
-
-
-
-# Youcans 原创作品：[Python数模笔记@Youcans](https://blog.csdn.net/youcans )
 
 

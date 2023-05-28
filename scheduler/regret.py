@@ -1,16 +1,41 @@
 import util
+from conM.FixedMess import FixedMes
 from util.utils import choice
 from scheduler.scheduler import Scheduler
 import random
 import copy
+def calLFTandMTS(SucOrder):
+    dfsLFT(SucOrder, 0)
+    dfsMTS(SucOrder, 0)
 
+def dfsLFT(SucOrder, i):
+    if len(SucOrder[i].successor) == 0:
+        SucOrder[i].lf = FixedMes.lowTime
+        return FixedMes.lowTime
+
+    time = 999
+    for Orderid in SucOrder[i].successor:
+        time = min(time,dfsLFT(SucOrder,Orderid)-SucOrder[Orderid].duration)
+    SucOrder[i].lf = time
+    return time
+
+def dfsMTS(SucOrder,i):
+    if len(SucOrder[i].successor)==0:
+        return [SucOrder[i].id]
+
+    record = copy.deepcopy(SucOrder[i].successor)
+    for Orderid in SucOrder[i].successor:
+        record = list(set(record + dfsMTS(SucOrder,Orderid)))
+
+    SucOrder[i].mts = len(record)
+    return record
 def calNj(E,alltasks):
     u = [0 for i in range(len(E))]
     y = [0.0 for i in range(len(E))]
-
+    x= alltasks[E[0]]
     for j in range(len(E)):
         for i in range(len(E)):
-            u[j] = max(alltasks(E[i]).lf-alltasks(E[j]).lf)
+            u[j] = max(alltasks[E[i]].lf-alltasks[E[j]].lf,u[j])
     sumu=0
     for i in range(len(E)):
         sumu+=(u[i]+1)
@@ -22,7 +47,7 @@ def calNj(E,alltasks):
     for j in range(len(y)):
         cum += y[j]
         if cum >= m:
-            return j
+            return E[j]
 
 def encoderRule(allTasks):
     # 设备保障范围约束
@@ -41,9 +66,9 @@ def encoderRule(allTasks):
                 Ei_0.append(key)
                 task.append(cloneA[key])
 
-        Ei_0 = calNj(Ei_0,allTasks)
+        Ei_number = calNj(Ei_0,allTasks)
 
-        random_Ei_0 = Ei_0
+        random_Ei_0 = Ei_number
         chromosome.append([random_Ei_0, cloneA[random_Ei_0].belong_plane_id, cloneA[random_Ei_0].taskid])
         allTasks[random_Ei_0].priority = a
         for key, Ei in cloneA.items():

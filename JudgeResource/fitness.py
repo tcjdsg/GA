@@ -58,36 +58,48 @@ def recordBestAndBad(g, Pops):
         if pop.DVPC > DVPU:
             DVPU = pop.DVPC
             FixedMes.recordBadD[g] = pop
-    guiyihua(g, Pops)
+    # guiyihua(g, Pops)
 
     SumTime = 0
     BestCmax = 999
     BestPr = 0
     BestE=999
     Bestzonghe = 999999999999
+    var=0
     for i in FixedMes.AllFit:
-        if i.Pr > BestPr:
-            BestPr = i.Pr
-
-        if i.Ecmax < BestE:
-            BestE = i.Ecmax
+        # if i.Pr > BestPr:
+        #     BestPr = i.Pr
+        #
+        # if i.Ecmax < BestE:
+        #     BestE = i.Ecmax
 
         if i.WorkTime < BestCmax:
             BestCmax = i.WorkTime
 
-        if i.zonghe < Bestzonghe:
-            Bestzonghe = i.zonghe
+        # if i.zonghe < Bestzonghe:
+        #     Bestzonghe = i.zonghe
 
         SumTime += i.WorkTime
+
 
     FixedMes.AverPopTime = SumTime / len(FixedMes.AllFit)
 
     FixedMes.Avufit[g] = FixedMes.AverPopTime
-
-    FixedMes.BestEcmax[g] = BestE
+    #
+    # FixedMes.BestEcmax[g] = BestE
     FixedMes.BestCmax[g] = BestCmax
-    FixedMes.Bestzonghe[g] = Bestzonghe
-    FixedMes.BestPr[g] = BestPr
+    # FixedMes.Bestzonghe[g] = Bestzonghe
+    # FixedMes.BestPr[g] = BestPr
+
+    FixedMes.f[g] = FixedMes.Avufit[g]/FixedMes.Avufit[0]
+    var = 0
+    for i in FixedMes.AllFit:
+        var += abs(i.WorkTime - FixedMes.Avufit[g])
+
+    FixedMes.var[g] = var
+    FixedMes.d[g] = FixedMes.var[g]/FixedMes.var[0]
+    FixedMes.m[g] = FixedMes.BestCmax[g]/FixedMes.BestCmax[0]
+
 '''
 归一化
 '''
@@ -195,24 +207,6 @@ def fitness(iter, Cmax ,Ns):
         iter.activityES[key] = acti.es
         iter.activityEF[key] = acti.ef
 
-    # Draw1(Humans)
-    count = Ns
-    SUM = 0
-    p = 0
-    adj = newAON(Humans, Stations, Spaces)
-    while count > 0:
-        result = simMonte(newAct, adj)
-        # execution_historyToshow(result, newAct)
-        newworkTime = result.total_time
-        if newworkTime < Cmax:
-            p += 1
-        SUM += newworkTime
-        count -= 1
-
-    Ecmax = SUM / Ns
-    Pr = p / Ns
-    iter.Ecmax = Ecmax
-    iter.Pr = Pr
     iter.setf()
     return Humans, Stations, Spaces,  newAct
 

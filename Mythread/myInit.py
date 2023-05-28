@@ -15,6 +15,7 @@ from collections import defaultdict
 
 from JudgeResource.judgeH import judgeHuman, judgeStation, judgeSpace, allocationHuman, allocationStation, judgeRenew
 from ORM.newDAG import newAON
+from scheduler.regret import encoderRule, calLFTandMTS
 from util.utils import *
 import numpy as np
 
@@ -40,16 +41,17 @@ class MyInit(object):
         FixedMes.act_info = self.activities
 
     def InitPopulation(self):
+        calLFTandMTS(self.activities)
         num = 0
         print("正在生成种群。。。。")
         while num < FixedMes.populationnumber:
 
             iter = Chromosome()
+            # codes = encoderRule(self.activities)
             codes = self.encoder()
             iter.setcodes(codes)
             Human, Station, space, workTime, act_info = MyInit.fitness(iter)
             edge = newAON(Human, Station, space)
-
             iter.WorkTime = workTime
 
             FixedMes.AllFit[num] = copy.deepcopy(iter)

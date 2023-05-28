@@ -1,4 +1,4 @@
-
+import numpy as np
 
 
 class Chromosome():
@@ -38,12 +38,25 @@ class Chromosome():
         if self.rank==other.rank and self.crowding_distance < other.crowding_distance:
             return True
         return  False
+
+    def indices(self):
+        """
+        Returns a mapping from job -> idx in the schedule. Unscheduled
+        jobs have index +inf.
+        """
+        indices = np.full(len(self.codes), 0, dtype=int)
+
+        for idx, job in enumerate(self.codes):
+            id = job[0]
+            indices[id] = idx
+        return indices
+
     def setf(self):
 
         self.zonghe = 10**7*(1.0-self.Pr) + self.Ecmax
 
         # self.newf =[self.Ecmax,self.Pr,self.WorkTime]
-        self.f=[self.Pr,self.Ecmax]
+        self.f = [self.Pr, self.Ecmax]
         return self.f
     def setDVPU(self,bestEF):
         for i in range(len(bestEF)):

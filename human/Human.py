@@ -13,23 +13,46 @@ class Human:
         self.NowJZJ = 0
         self.NowTaskId = 0
         self.walkState = False
+        self.rest = 0.1
 
 
         self.fatigue = 0
+        self.record_fatigue = []
         self.alreadyworkTime = 0
         self.OrderOver = [] #已完成工序
         self.TaskWait = [] #待完成工序
         self.WalkTask = [] #走
 
-    def update(self,Activity):
-        self.alreadyworkTime += Activity.duration
+    def update(self, Activity):
         self.OrderOver.append(copy.deepcopy(Activity))
         self.OrderOver.sort(key=lambda x: x.es)
 
+        temp=[]
+        self.record_fatigue=[[0,0]]
+        self.fatigue =0
+
+        for i in range(len(self.OrderOver)):
+            activ = self.OrderOver[i]
+            temp.append(activ)
+            vacp = activ.vacp
+            if i==0:
+                self.fatigue += (activ.es - 0) * self.rest
+            else:
+                self.fatigue += (activ.es - temp[-1].ef) * self.rest
+            self.record_fatigue.append([activ.es, self.fatigue])
+            self.fatigue += activ.duration * vacp
+            self.record_fatigue.append([activ.ef, self.fatigue])
+
+        self.alreadyworkTime += Activity.duration
+
+    def getfatigue(self, time):
+        # fatigue = self.fatigue+self.rest * (time - self.OrderOver[-1].ef)
+        return self.fatigue
+
     def getmovetime(self):
-        time=0
+        time = 0
         self.OrderOver.sort(key=lambda x: x.es)
-        if len(self.OrderOver)>=2:
+        if len(self.OrderOver) >= 2:
          for index in range(len(self.OrderOver)-1):
 
             from_pos = self.OrderOver[index].belong_plane_id

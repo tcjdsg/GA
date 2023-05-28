@@ -1,40 +1,96 @@
-import copy
-import functools
-import math
-import numpy as np
 import torch
-
 from JudgeResource.fitness import fitness, recordBestAndBad
-from Mythread.myInit import MyInit
-from util import utils
-
 from chromosome.Chromo import Chromosome
-
 from  collections import defaultdict
-
 from util.utils import *
 import random
+import time
+import numpy as np
+from conM.FixedMess import FixedMes
 
-class Ga(object):
+
+class QLGa(object):
     def __init__(self):
         # self.Init = myInit.MyInit(dis_file,order_file)
         self.pa = FixedMess.FixedMes
         self.acts = FixedMes.Activity_num
+        # 状态
+        self.N_STATES = 21
+        self.Actions = [i for i in range(10)]
+        self.EPSILON = 0.9
+        self.ALPHA = 0.1
+        self.GAMMA = 0.9
+        self.MAX_EPISODES = 15
+        self.FRESH_TIME = 0.3
+        self.TerminalFlag = "terminal"
+
+        self.Pc = [[0.4, 0.45],
+                      [0.45, 0.5],
+                      [0.5, 0.55],
+                      [0.55, 0.6],
+                      [0.6, 0.65],
+                      [0.65, 0.7],
+                      [0.7, 0.75],
+                      [0.75, 0.8],
+                      [0.8, 0.85],
+                      [0.85, 0.9]]
+
+        self.Pm = [[0.01, 0.03],
+                      [0.03, 0.05],
+                      [0.05, 0.07],
+                      [0.07, 0.09],
+                      [0.09, 0.11],
+                      [0.11, 0.13],
+                      [0.13, 0.15],
+                      [0.15, 0.17],
+                      [0.17, 0.19],
+                      [0.19, 0.21]]
 
         self.DCmin=10
         self.humanNum = self.pa.humanNum
+        self.Pm_q_table = build_Pm_q_table(self.N_STATES, self.Actions)
+        self.Pc_q_table = build_Pc_q_table(self.N_STATES, self.Actions)
+        self.w1 = 0.35
+        self.w2 = 0.35
+        self.w3 = 0.3
+
+    def State(self,g):
+        f = FixedMes.f[g]
+        d = FixedMes.d[g]
+        m = FixedMes.m[g]
+        s = int((self.w1*f+self.w2*d+self.w3*m)*100)
+
+        return int(s/7)
+
+    def choose_action(self, state, q_table, ACTIONS):
+        state_table = q_table.loc[state, :]
+        if (np.random.uniform() > self.EPSILON) or ((state_table == 0).all()):
+            action_number = np.random.choice(ACTIONS)
+            # action = random.random()*(action_fanwei[1]-action_fanwei[0])+action_fanwei[0]
+            #
+        else:
+            index = state_table.idxmax()
+            action_number = ACTIONS[index]
+        #     action = random.random() * (action_fanwei[1] - action_fanwei[0]) + action_fanwei[0]
+        return action_number
 
     def RUN(self,i,pop,cmax,ns):
+        self.cur = i
+        self.S =self.State(self.cur-1)
+        self.Pm_number = self.choose_action(self.S, self.Pm_q_table, self.Actions)
+        self.Pc_number = self.choose_action(self.S, self.Pc_q_table, self.Actions)
+        self.Pc_A = random.random()*(self.Pc[self.Pc_number][1]-self.Pc[self.Pc_number][0])+self.Pc[self.Pc_number][0]
+        self.Pm_A = random.random()*(self.Pm[self.Pm_number][1]-self.Pm[self.Pm_number][0])+self.Pm[self.Pm_number][0]
+        print("交叉率-{}-----变异率-{}------",self.Pc_A,self.Pm_A)
         self.Cmax= cmax
         self.ns = ns
         self.Pop = pop
-        self.cur=i
+
         self.count = 0
         # print("----------- ----",i,"--------------")
         self.select()
         self.Crossover()
         self.Variation()
-        self.Pop = FixedMes.AllFitSon
         self.updata()
         return self.count
 
@@ -81,20 +137,9 @@ class Ga(object):
         for two in FixedMes.Paternal:
             if two[0] == 0 and two[1] == 0:
                 break
-            k1 = 0.0
-            if self.cur <= FixedMes.AgenarationIten:
-                k1 = FixedMes.cross
-            else:
-
-                k1 = FixedMes.cross * (FixedMes.cross1 - 2 * math.pow(math.e, -(float(self.cur) / float(ge))) / (
-                            1 + math.pow(math.e, - (float(self.cur) / float(ge)))))
-            num = utils.getRandNum(0, 100)
-            if (k1 >= 0.99):
-                k1 = 0.99
-            if (k1 <= 0.05):
-                k1 = 0.05
+            num = getRandNum(0, 100)
+            k1 = self.Pc_A
             k1 = int((k1 * 100) % 100)
-            # FixedMes.resver_k1[self.cur] = k1
             if num <= k1:
                 # 交叉
                 temp1, temp2 = self.cr2(FixedMes.AllFit[two[0]], FixedMes.AllFit[two[1]])
@@ -115,6 +160,7 @@ class Ga(object):
 
         temp1 = copy.deepcopy(b[:pos])
         temp2 = copy.deepcopy(a[:pos])
+
         temp = copy.deepcopy(b[pos:])
         tempx = copy.deepcopy(a[pos:])
         for j in range(self.acts):
@@ -141,29 +187,16 @@ class Ga(object):
         self.count += 2
 
         return pop11, pop22
+
     def Variation(self):
         ge = FixedMes.ge
         for i in range(len(FixedMes.AllFitSon)):
-
-            k2 = 0
-            if self.cur <= FixedMes.AgenarationIten:
-                k2 = FixedMes.MutationRate
-            else:
-                k2 = FixedMes.MutationRate * (2 * math.pow(math.e, -(float(self.cur) / float(ge))) / (
-                            1 + math.pow(math.e, - (float(self.cur) / float(ge)))))
-
-            num = utils.getRandNum(0, 100)
-            if (k2 >= 0.99):
-                k2 = 0.99
-            if (k2 <= 0.05):
-                k2 = 0.05
+            num =getRandNum(0, 100)
+            k2 = self.Pm_A
             k2 = int((k2 * 100) % 100)
             # FixedMes.resver_k2[self.cur] = k2
             if num <= k2:
-                jobIndex = np.random.randint(FixedMes.planeNum, FixedMes.Activity_num - FixedMes.planeNum)
-                # FixedMes.AllFitSon[i] = copy.deepcopy(self.Insert(FixedMes.AllFitSon[i], jobIndex))
                 FixedMes.AllFitSon[i] = copy.deepcopy(self.var1(FixedMes.AllFitSon[i]))
-
 
     # FixedMes.AllFit = copy.deepcopy(FixedMes.AllFitSon)
     '''
@@ -210,107 +243,86 @@ class Ga(object):
                     prece.remove(random_Ei_0)
             del newActs[random_Ei_0]
         return newcode
-    # def insert(self, opt, pop):
-    #     a = copy.deepcopy(pop)
-    #     self.inser(opt, a, FixedMes.act_info)
-    #     # MyInit.fitness(a, [], [], [])
-    #     return a
-    # def inser(self, opt, pop, activities):
-    #
-    #     preorder = activities[opt].predecessor
-    #     success = activities[opt].successor
-    #
-    #     ts = 0
-    #     es = 999
-    #     newcode = []
-    #     newcode.append(pop.codes[0][:opt] + pop.codes[0][opt + 1:])
-    #     newcode.append(pop.codes[1][:opt] + pop.codes[1][opt + 1:])
-    #
-    #     # 得到了
-    #     for id in preorder:
-    #         if pop[0][id].es > ts:
-    #             ts = activities[id].es
-    #
-    #     for id in success:
-    #         if activities[id].es < es:
-    #             es = activities[id].es
-    #
-    #     code = []
-    #
-    #     for time in newcode[0]:
-    #         if time[1] >= ts and time[1] <= es:
-    #             code.append(time)
-    #
-    #     qujian = sorted(code, key=lambda x: x[1])
-    #     optnow = np.random.choice([x for x in range(0, len(qujian) - 1)], 1, replace=False)[0]
-    #     time1 = qujian[optnow][1]
-    #     time2 = qujian[optnow + 1][1]
-    #
-    #     a = random.uniform(time1, time2)
-    #
-    #     pop.codes[0][opt] = [opt, a]
-    #     pop.codes[1][opt] = [opt, a + activities[opt].duration]
-    # def exchange1(self, pop):
-    #
-    #     newpop = copy.deepcopy(pop)
-    #     a = newpop.codes
-    #
-    #     i = np.random.choice(FixedMes.jzjNumbers, 1, replace=False)
-    #     jzj = i[0]
-    #
-    #     poslist = []  # 记录飞机i各工序在a中的位置
-    #     for m in range(len(a[0])):
-    #         # print("Varition",a[m])
-    #         if self.acts[a[0][m][0]].belong_plane_id == jzj:
-    #             poslist.append(m)
-    #
-    #     dr = np.random.choice([x for x in poslist], 5, replace=False)
-    #
-    #     for opt in dr:
-    #         self.inser(opt, newpop, FixedMes.act_info)
-    #
-    #     # MyInit.fitness(newpop, [], [], [])
-    #     return newpop
-    # def exchange2(self, pop):
-    #
-    #     newpop = copy.deepcopy(pop)
-    #     a = newpop.codes
-    #
-    #     i = np.random.choice(FixedMes.jzjNumbers, 1, replace=False)
-    #     jzj = i[0]
-    #
-    #     poslist = []  # 记录飞机i各工序在a中的位置
-    #     for m in range(len(a[0])):
-    #         # print("Varition",a[m])
-    #         if self.acts[a[0][m][0]].belong_plane_id == jzj:
-    #             poslist.append(m)
-    #
-    #     for opt in poslist:
-    #         self.inser(opt, newpop, self.acts)
-    #     return newpop
+    def insert(self, opt, pop):
+        a = copy.deepcopy(pop)
+        self.inser(opt, a, FixedMes.act_info)
+        # MyInit.fitness(a, [], [], [])
+        return a
+    def inser(self, opt, pop, activities):
 
-    def Insert(self, popi, jobIndex):
-        indices = popi.indices()
+        preorder = activities[opt].predecessor
+        success = activities[opt].successor
 
-        ll = np.array([np.max(indices[self.pa.act_info[jobIndex].predecessor], initial=-1)])+1
-        rl = np.array([np.min(indices[self.pa.act_info[jobIndex].successor], initial=FixedMes.Activity_num)])
-        for id in range(len(popi.codes)):
-            if popi.codes[id][0] == jobIndex:
-                record = popi.codes.pop(id)
-                break
-        try:
-            choose_Insert = np.random.randint(ll, rl)[0] if ll < rl else ll
-        except:
-            print(ll,rl)
+        ts = 0
+        es = 999
+        newcode = []
+        newcode.append(pop.codes[0][:opt] + pop.codes[0][opt + 1:])
+        newcode.append(pop.codes[1][:opt] + pop.codes[1][opt + 1:])
 
-        popi.codes.insert(choose_Insert,record)
-        # for id in range(len(popi.codes)):
-        #     if popi.codes[id][0] == FixedMes.Activity_num-1:
-        #         print(id)
-        fitness(popi, self.Cmax, self.ns)
-        return popi
-    def LinyuExchangePeople(self):
-        a=1111
+        # 得到了
+        for id in preorder:
+            if pop[0][id].es > ts:
+                ts = activities[id].es
+
+        for id in success:
+            if activities[id].es < es:
+                es = activities[id].es
+
+        code = []
+
+        for time in newcode[0]:
+            if time[1] >= ts and time[1] <= es:
+                code.append(time)
+
+        qujian = sorted(code, key=lambda x: x[1])
+        optnow = np.random.choice([x for x in range(0, len(qujian) - 1)], 1, replace=False)[0]
+        time1 = qujian[optnow][1]
+        time2 = qujian[optnow + 1][1]
+
+        a = random.uniform(time1, time2)
+
+        pop.codes[0][opt] = [opt, a]
+        pop.codes[1][opt] = [opt, a + activities[opt].duration]
+    def exchange1(self, pop):
+
+        newpop = copy.deepcopy(pop)
+        a = newpop.codes
+
+        i = np.random.choice(FixedMes.jzjNumbers, 1, replace=False)
+        jzj = i[0]
+
+        poslist = []  # 记录飞机i各工序在a中的位置
+        for m in range(len(a[0])):
+            # print("Varition",a[m])
+            if self.acts[a[0][m][0]].belong_plane_id == jzj:
+                poslist.append(m)
+
+        dr = np.random.choice([x for x in poslist], 5, replace=False)
+
+        for opt in dr:
+            self.inser(opt, newpop, FixedMes.act_info)
+
+        # MyInit.fitness(newpop, [], [], [])
+        return newpop
+    def exchange2(self, pop):
+
+        newpop = copy.deepcopy(pop)
+        a = newpop.codes
+
+        i = np.random.choice(FixedMes.jzjNumbers, 1, replace=False)
+        jzj = i[0]
+
+        poslist = []  # 记录飞机i各工序在a中的位置
+        for m in range(len(a[0])):
+            # print("Varition",a[m])
+            if self.acts[a[0][m][0]].belong_plane_id == jzj:
+                poslist.append(m)
+
+        for opt in poslist:
+            self.inser(opt, newpop, self.acts)
+
+        # MyInit.fitness(newpop, [], [], [])
+        return newpop
 
 
     def var1(self, pop):
@@ -326,27 +338,23 @@ class Ga(object):
             # print("Varition",a[m])
             if a[m][1] == jzj:
                 poslist.append(m)
-        dr=-1
+
         TI=[-1]
         Td=[-1]
 
         try:
-            dr = np.random.choice([x for x in range(4, 9)], 1, replace=False)[0]
-            TI = np.random.choice([x for x in range(1, FixedMes.planeOrderNum - 3 - dr)], 1, replace=False)
 
-            Td = poslist[TI[0]:TI[0] + dr]
-            x1 = Td[0]
-            x2 = Td[-1]
-            for gongxu in Td:
+            for gongxu in poslist:
                 duan_code.append(a[gongxu])
 
             newcode = self.daluan(duan_code)
-            for q in range(dr):
-                a.pop(Td[q] - q)
+            for q in range(len(poslist)):
+                a.pop(poslist[q] - q)
 
-            number = [x1 - 1]
-            for i in range(dr - 1):
-                num = np.random.randint(number[-1] + 1, x2 - (dr - 2 - i))
+            number = [1]
+            x2 = len(pop.codes)-2
+            for i in range(len(poslist) - 1):
+                num = np.random.randint(number[-1] + 1, x2 - (len(poslist) - 2 - i))
                 number.append(num)
                 a.insert(num, newcode[i])
 
@@ -360,7 +368,6 @@ class Ga(object):
         except:
             print("变异发生了错误。。。。。。")
             print(poslist)
-            print(dr)
             print(TI)
             print(Td)
         self.count += 1
@@ -368,69 +375,7 @@ class Ga(object):
         fitness(newpop, self.Cmax, self.ns)
         return newpop
 
-    # def var2(self,pop):
-    #
-    #     suiji =random.random()*100%len(self.acts)
-    #     suijn =
-    #     jzj = i[0]
-    #
-    #     poslist = []  # 记录飞机i各工序在a中的位置
-    #     for m in range(self.acts):
-    #         # print("Varition",a[m])
-    #         if a[m][1] == jzj:
-    #             poslist.append(m)
-    #
-    #     dr = np.random.choice([x for x in range(2, 6)], 1, replace=False)
-    #     TI = np.random.choice([x for x in range(1, FixedMes.planeOrderNum - 3 - dr)], 1, replace=False)
-    #
-    #     Td = poslist[TI[0]:TI[0] + dr]
-    #     x1 = Td[0]
-    #     x2 = Td[-1]
-    #
-    #     for gongxu in Td:
-    #         duan_code.append(a[gongxu])
-    #
-    #     newcode = self.daluan(duan_code)
-    #     for q in range(dr):
-    #         a.pop(Td[q] - q)
-    #     number = [x1-1]
-    #     for i in range(dr - 1):
-    #         num = np.random.randint(number[-1] + 1, x2 - (dr - 2 - i))
-    #         number.append(num)
-    #         a.insert(num, newcode[i])
-    #
-    #     num = number[-1]
-    #     if (num + 1) < x2:
-    #         number5 = np.random.randint(num + 1, x2 + 1)
-    #         a.insert(number5, newcode[-1])
-    #     if (num + 1) == x2:
-    #         number5 = x2
-    #         a.insert(number5, newcode[-1])
-    #     return a
-    '''
-     self.WorkTime = 9999
-
-        self.variance = 9999.0
-
-        self.movetime = 9999.0
-    '''
-
-    # def pareto_compare(self, arrSlect, pop):
-    #     reres = [0, 0]
-    #     lenn = len(arrSlect)
-    #     arrCh = [copy.deepcopy(pop[i]) for i in arrSlect]
-    #
-    #     arrCh.sort(key=lambda x: x.zonghe)
-    #
-    #     for i in range(lenn):
-    #         if pop[arrSlect[i]].codes == arrCh[0].codes:
-    #             reres[0] = arrSlect[i]
-    #         elif pop[arrSlect[i]].codes == arrCh[1].codes:
-    #             reres[1] = arrSlect[i]
-    #     return reres
-    #
     def updata(self):
-
         FixedMes.AllFit=sorted(FixedMes.AllFit,key=lambda x:x.WorkTime)
         best = copy.deepcopy(FixedMes.AllFit[0])
         FixedMes.AllFitSon=sorted(FixedMes.AllFitSon, key=lambda x: -x.WorkTime)
@@ -440,6 +385,33 @@ class Ga(object):
         FixedMes.AllFit[0] = copy.deepcopy(best)
         recordBestAndBad(self.cur, FixedMes.AllFit)
 
+        self.S_ = self.State(self.cur)
+
+        shangBestFit = FixedMes.BestCmax[self.cur - 1]
+        shangAvrFit = FixedMes.Avufit[self.cur - 1]
+
+        BestFit = FixedMes.BestCmax[self.cur]
+        AvrFit = FixedMes.Avufit[self.cur]
+
+        rc = (BestFit - shangBestFit) / shangBestFit
+        rm = (AvrFit - shangAvrFit) / shangAvrFit
+
+        # S_, rc, rm = get_env_feedback(self.S, self.cur, self.Pm_A, self.Pc_A)
+        Pm_q_predict = self.Pm_q_table.loc[self.S, self.Pm_number]
+        Pc_q_predict = self.Pc_q_table.loc[self.S, self.Pc_number]
+
+
+        Pm_q_target = rm + self.GAMMA * self.Pm_q_table.loc[self.S_, :].max()
+        Pc_q_target = rc + self.GAMMA * self.Pc_q_table.loc[self.S_, :].max()
+        # else:
+        #     Pm_q_target = rm
+        #     Pc_q_target = rc
+        #     is_terminated = True
+        self.Pm_q_table.loc[self.S, self.Pm_number] += self.ALPHA * (Pm_q_target - Pm_q_predict)
+        self.Pc_q_table.loc[self.S, self.Pc_number] += self.ALPHA * (Pc_q_target - Pc_q_predict)
+        # self.S = self.S_
+
+        # dc=self.first(dataEdge)
     def writeArrayList(self,dcNextAll , nowHuman):
         ds = "output/paretoFor0" + nowHuman + ".txt"
         aimValue = 5
@@ -534,5 +506,5 @@ class Ga(object):
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-   g=Ga("C:/Users/29639/Desktop/sim/dis.csv","C:/Users/29639/Desktop/sim/dis.csv")
+   g=QLGa("C:/Users/29639/Desktop/sim/dis.csv","C:/Users/29639/Desktop/sim/dis.csv")
    g.RUN(1)

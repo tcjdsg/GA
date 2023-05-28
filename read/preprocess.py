@@ -60,6 +60,7 @@ class InitM(object):
                 index += 1
                 taskId = j+1
                 duration = FixedMes.OrderTime[taskId]
+                vacp = FixedMes.VACP[taskId]
                 resourceH = [0 for _ in range(FixedMes.Human_resource_type)]
                 # nt()pri
                 resourceH[FixedMes.OrderInputMes[taskId][0][0]] = FixedMes.OrderInputMes[taskId][0][1]
@@ -77,7 +78,7 @@ class InitM(object):
                     SUCOrder.append((FixedMes.planeOrderNum)*FixedMes.planeNum+1)
 
                 task = Order(index, taskId,duration, resourceH,resourceS,resourceSpace,SUCOrder,jzjNumber)
-
+                task.vacp = vacp
                 activities[index] = task
                 for s in SUCOrder:
                     preActDict[s].append(index)

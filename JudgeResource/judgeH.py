@@ -171,8 +171,85 @@ def judgeSpace(allTasks, spaces, resourceSumSpace, selectTaskID, now_pos, t, dur
                             or (t + dur) <= (Activity1.es):
                         resourceSumSpace[now_pos - 1] += 1  # 该类资源可用+1
     return resourceSumSpace
+def judgeHuman1(Human, type, resourceRequestH1, resourceSumH1, recordH1, now_pos, t, dur):
+    # 全甲板模式
+    if FixedMes.modeflag == 0:
+        typeHuman = Human[type]
+    else:
+        typeHuman = Human[int((now_pos - 1) / FixedMes.modeflag)][type]
+    if resourceRequestH1[type] > 0:
+        for human in typeHuman:
+            if (len(human.OrderOver) == 0):
+                resourceSumH1[type] += 1  # 该类资源可用+1
+                recordH1[type].append(human)
+            if (len(human.OrderOver) == 1):
+                Activity1 = human.OrderOver[0]
+                from_pos = Activity1.belong_plane_id
+                to_pos = Activity1.belong_plane_id
+                movetime1 = 0
+                movetime2 = 0
+                if (Activity1.ef + round(movetime1, 0)) <= t \
+                        or (t + dur) <= (Activity1.es - round(movetime2, 0)):
+                    resourceSumH1[type] += 1  # 该类资源可用+1
+                    recordH1[type].append(human)
+            # 遍历船员工序，找到可能可以插入的位置,如果船员没有工作，人力资源可用
+            if (len(human.OrderOver) >= 2):
+                flag = False
+                for taskIndex in range(len(human.OrderOver) - 1):
+                    Activity1 = human.OrderOver[taskIndex]
+                    Activity2 = human.OrderOver[taskIndex + 1]
 
-def allocationHuman(recordH1, resourceRequestH1,humans1, allTasks, selectTaskID,now_pos):
+                    from_pos = Activity1.belong_plane_id
+                    to_pos = Activity2.belong_plane_id
+                    movetime1 = 0
+                    movetime2 = 0
+
+                    if (Activity1.ef + round(movetime1, 0)) <= t \
+                            and (t + dur) <= (Activity2.es - round(movetime2, 0)):
+                        flag = True
+                        resourceSumH1[type] += 1  # 该类资源可用+1
+                        recordH1[type].append(human)
+                        break
+
+                if flag == False:
+                    Activity1 = human.OrderOver[0]
+                    Activity2 = human.OrderOver[-1]
+                    from_pos = Activity2.belong_plane_id
+                    to_pos = Activity1.belong_plane_id
+                    movetime2 = 0
+                    movetime1 = 0
+
+                    if (Activity2.ef + round(movetime2, 0)) <= t \
+                            or (t + dur) <= (Activity1.es - round(movetime1, 0)):
+                        resourceSumH1[type] += 1  # 该类资源可用+1
+                        recordH1[type].append(human)
+
+    return resourceSumH1, recordH1
+def allocationHuman1(recordH1, resourceRequestH1, humans1, allTasks, selectTaskID, nowTime,now_pos):
+        for type in range(len(recordH1)):
+            need = resourceRequestH1[type]
+            while need > 0:
+                fatigue = 9999999999999
+                index = 0
+                for nowHuman in recordH1[type]:
+                    temp = nowHuman.getfatigue(nowTime)
+                    if temp < fatigue:
+                        fatigue = temp
+                        index = nowHuman.zunumber
+
+                for idn in range(len(recordH1[type])):
+                    if recordH1[type][idn].zunumber == index:
+                        recordH1[type].remove(recordH1[type][idn])
+                        break
+                # 更新人员
+                if FixedMes.modeflag == 0:
+                    humans1[type][index].update(allTasks[selectTaskID])
+                    allTasks[selectTaskID].HumanNums.append([type, index])
+                else:
+                    humans1[int((now_pos - 1) / FixedMes.modeflag)][type][index].update(allTasks[selectTaskID])
+                    allTasks[selectTaskID].HumanNums.append([type, index])
+                need -= 1
+def allocationHuman(recordH1, resourceRequestH1,humans1, allTasks, selectTaskID, now_pos):
         for type in range(len(recordH1)):
             need = resourceRequestH1[type]
             while need > 0:

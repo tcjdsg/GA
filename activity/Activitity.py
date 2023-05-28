@@ -12,6 +12,7 @@ class Order(object):
         self.id = id
         self.taskid = taskid
         self.belong_plane_id = jzjId
+        self.vacp = 0
 
         self.duration = duration
         self.resourceRequestH = resourceRequestH
